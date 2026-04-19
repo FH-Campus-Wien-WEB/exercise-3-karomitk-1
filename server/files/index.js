@@ -62,6 +62,9 @@ function loadMovies(genre) {
 
   const url = new URL("/movies", location.href)
   /* Task 1.4. Add query parameter to the url if a genre is given */
+  if (genre) {
+  url.searchParams.set("genre", genre);
+}
 
   xhr.open("GET", url)
   xhr.send()
@@ -78,11 +81,39 @@ window.onload = function () {
          loadMovies(...) function above. */
       const genres = JSON.parse(xhr.responseText);
 
-      /* When a first button exists, we click it to load all movies. */
-      const firstButton = document.querySelector("nav button");
-      if (firstButton) {
-        firstButton.click();
+      const listElement = document.querySelector("nav>ul");
+
+      // ---- "All" button ----
+      const allLi = document.createElement("li");
+      const allButton = document.createElement("button");
+
+      allButton.textContent = "All";
+
+      allButton.addEventListener("click", () => {
+        loadMovies(); // no filter
+      });
+
+      allLi.appendChild(allButton);
+      listElement.appendChild(allLi);
+
+      // ---- genre buttons ----
+      for (const genre of genres) {
+        const li = document.createElement("li");
+        const button = document.createElement("button");
+
+        button.textContent = genre;
+
+        button.addEventListener("click", () => {
+          loadMovies(genre);
+        });
+
+        li.appendChild(button);
+        listElement.appendChild(li);
       }
+
+      // auto-load all movies
+      allButton.click();
+      
     } else {
       document.querySelector("body").append(`Daten konnten nicht geladen werden, Status ${xhr.status} - ${xhr.statusText}`);
     }
